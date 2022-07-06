@@ -1,0 +1,34 @@
+{
+	"emulators": {
+		"default": {
+			"port": 3569,
+			"serviceAccount": "emulator-account"
+		}
+	},
+	"contracts": {
+		"CryptoPoops": {
+			"source": "./contracts/CryptoPoops.cdc",
+			"aliases": {
+				"emulator": "0xf8d6e0586b0a20c7"
+			}
+		}
+	},
+	"networks": {
+		"emulator": "127.0.0.1:3569",
+		"mainnet": "access.mainnet.nodes.onflow.org:9000",
+		"testnet": "access.devnet.nodes.onflow.org:9000"
+	},
+	"accounts": {
+		"emulator-account": {
+			"address": "0xf8d6e0586b0a20c7",
+			"key": "51e59844abd80258c60f889d8e1025f1054dc82175a6298489c17211f3b61620"
+		}
+	},
+	"deployments": {
+		"emulator": {
+			"emulator-account": [
+				"CryptoPoops"
+			]
+		}
+	}
+}
