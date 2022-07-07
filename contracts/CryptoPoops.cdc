@@ -33,6 +33,8 @@ pub contract CryptoPoops: NonFungibleToken {
 
 		pub fun deposit(token: @NonFungibleToken.NFT) {
 			let cryptoPoop <- token as! @NFT
+			emit Deposit(id : cryptoPoop.id, to: self.owner?.address)
+
 			self.ownedNFTs[cryptoPoop.id] <-! cryptoPoop
 		}
 
@@ -40,6 +42,7 @@ pub contract CryptoPoops: NonFungibleToken {
 			let token <- self.ownedNFTs.remove(key: withdrawID)
 				?? panic("Token not found")
 
+			emit Withdraw(id: withdrawID, from: self.owner?.address)
 			return <- token
 		}
 
