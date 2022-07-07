@@ -6,6 +6,12 @@
 		}
 	},
 	"contracts": {
+		"NonFungibleToken" : {
+			"source" : "contracts/NonFungibleToken.cdc",
+			"aliases": {
+				"emulator": "0xf8d6e0586b0a20c7"
+			}
+		},
 		"CryptoPoops": {
 			"source": "./contracts/CryptoPoops.cdc",
 			"aliases": {
@@ -27,6 +33,7 @@
 	"deployments": {
 		"emulator": {
 			"emulator-account": [
+				"NonFungibleToken",
 				"CryptoPoops"
 			]
 		}

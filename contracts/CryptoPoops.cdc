@@ -1,7 +1,15 @@
-pub contract CryptoPoops {
+import NonFungibleToken from "./NonFungibleToken.cdc" 
+
+pub contract CryptoPoops: NonFungibleToken {
 	pub var totalSupply: UInt64
 
-	pub resource NFT {
+	pub event ContractInitialized()
+
+	pub event Withdraw(id: UInt64, from: Address?)
+
+	pub event Deposit(id: UInt64, to: Address?)
+
+	pub resource NFT: NonFungibleToken.INFT {
 		pub let id: UInt64
 
 		init() {
@@ -10,19 +18,16 @@ pub contract CryptoPoops {
 		}
 	}
 
-	pub resource interface CollectionPublic {
-		pub fun getIDs(): [UInt64]
-	}
 
-	pub resource Collection: CollectionPublic {
-		pub var ownedNFTs: @{UInt64: NFT}
+	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic {
+		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
-		pub fun deposit(token: @NFT) {
+		pub fun deposit(token: @NonFungibleToken.NFT) {
 			self.ownedNFTs[token.id] <-! token
 		}
 
-		pub fun withdraw(id: UInt64): @NFT {
-			let token <- self.ownedNFTs.remove(key: id)
+		pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+			let token <- self.ownedNFTs.remove(key: withdrawID)
 				?? panic("Token not found")
 
 			return <- token
@@ -30,6 +35,10 @@ pub contract CryptoPoops {
 
 		pub fun getIDs(): [UInt64] {
 			return self.ownedNFTs.keys
+		}
+
+		pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
+			return &self.ownedNFTs[id] as &NonFungibleToken.NFT
 		}
 
 		init() {
@@ -41,15 +50,25 @@ pub contract CryptoPoops {
 		}
 	}
 
-	pub fun createCollection(): @Collection {
+	pub fun createEmptyCollection(): @Collection {
 		return <- create Collection()
 	}
 
-	pub fun createNFT(): @NFT {
-		return <- create NFT()
+	
+
+	pub resource NFTMinter {
+		pub fun createNFT(): @NFT {
+			return <- create NFT()
+		}
+
+		init() {
+
+		}
 	}
 
 	init() {
 		self.totalSupply = 0
+		emit ContractInitialized()
+		self.account.save(<- create NFTMinter(), to:/storage/Minter)
 	}
 }
