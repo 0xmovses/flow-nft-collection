@@ -20,12 +20,20 @@ pub contract CryptoPoops: NonFungibleToken {
 		}
 	}
 
+	pub resource interface MyCollectionPublic {
+		pub fun deposit(token: @NonFungibleToken.NFT)
+		pub fun getIDs(): [UInt64]
+		pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
+		pub fun borrowEntireNFT(id: UInt64): &NFT
+	}
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic {
+
+	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MyCollectionPublic {
 		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
 		pub fun deposit(token: @NonFungibleToken.NFT) {
-			self.ownedNFTs[token.id] <-! token
+			let cryptoPoop <- token as! @NFT
+			self.ownedNFTs[cryptoPoop.id] <-! cryptoPoop
 		}
 
 		pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
@@ -41,6 +49,14 @@ pub contract CryptoPoops: NonFungibleToken {
 
 		pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
 			return &self.ownedNFTs[id] as &NonFungibleToken.NFT
+		}
+
+		//this allows us to get the name as it returns
+		// type of our NFT not NFT standard interface
+		pub fun borrowEntireNFT(id: UInt64): &NFT {
+			// auth key word downcasts NonFungibleToken.NFT to NFT(our NFT)
+			let refNFT = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT
+			return refNFT as! &NFT		
 		}
 
 		init() {
