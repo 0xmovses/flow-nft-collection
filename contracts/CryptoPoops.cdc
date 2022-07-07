@@ -11,10 +11,12 @@ pub contract CryptoPoops: NonFungibleToken {
 
 	pub resource NFT: NonFungibleToken.INFT {
 		pub let id: UInt64
+		pub let name : String
 
 		init() {
 			self.id = CryptoPoops.totalSupply
 			CryptoPoops.totalSupply = CryptoPoops.totalSupply + 1
+			self.name = "CryptoPoops"
 		}
 	}
 
